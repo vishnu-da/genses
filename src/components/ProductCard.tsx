@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Product } from "@/data/products";
 
@@ -7,8 +6,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
   const formatPrice = (price: number) => {
     return `Rs. ${price.toLocaleString("en-IN")}`;
   };
@@ -17,34 +14,17 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link
       to={`/product/${product.id}`}
       className="group block animate-fade-in"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image Container */}
       <div className="relative aspect-[3/4] overflow-hidden bg-secondary mb-4">
         <img
-          src={product.images[0]}
+          src={product.image}
           alt={product.name}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-            isHovered && product.images[1] ? "opacity-0" : "opacity-100"
-          }`}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        {product.images[1] && (
-          <img
-            src={product.images[1]}
-            alt={`${product.name} alternate view`}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-              isHovered ? "opacity-100" : "opacity-0"
-            }`}
-          />
-        )}
 
         {/* Size Pills - Show on hover */}
-        <div
-          className={`absolute bottom-3 left-3 right-3 flex flex-wrap gap-1 transition-all duration-300 ${
-            isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-          }`}
-        >
+        <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1 opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
           {product.sizes.map((size) => (
             <span
               key={size}

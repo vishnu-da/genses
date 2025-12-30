@@ -56,7 +56,7 @@ const ProductDetail = () => {
       <main className="lg:flex lg:min-h-[calc(100vh-64px)]">
         {/* Image Gallery - Left Side */}
         <div className="lg:w-[60%] lg:overflow-y-auto">
-          <ImageGallery images={product.images} productName={product.name} />
+          <ImageGallery image={product.image} productName={product.name} />
         </div>
 
         {/* Product Info - Right Side */}
@@ -82,6 +82,19 @@ const ProductDetail = () => {
               </h1>
               <p className="text-lg">{formatPrice(product.price)}</p>
               <p className="text-xs text-muted-foreground">Inclusive of all taxes</p>
+            </div>
+
+            {/* Fabric & Fit Badges */}
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1.5 text-xs tracking-wide bg-secondary text-secondary-foreground rounded-full">
+                {product.fabricComposition}
+              </span>
+              <span className="px-3 py-1.5 text-xs tracking-wide bg-secondary text-secondary-foreground rounded-full">
+                {product.styleArchetype}
+              </span>
+              <span className="px-3 py-1.5 text-xs tracking-wide bg-secondary text-secondary-foreground rounded-full">
+                {product.gender}
+              </span>
             </div>
 
             {/* Size Selector */}
@@ -135,6 +148,15 @@ const ProductDetail = () => {
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {product.description}
                   </p>
+                  {product.dimensions.chest > 0 && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <p className="text-xs text-muted-foreground mb-2">Size M Dimensions:</p>
+                      <div className="flex gap-6 text-sm">
+                        <span>Chest: {product.dimensions.chest}"</span>
+                        <span>Length: {product.dimensions.length}"</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -161,7 +183,7 @@ const ProductDetail = () => {
       </main>
 
       {/* Virtual Try-On Bot (Hidden for this version) */}
-      <VirtualTryOnBot productId={product.id} productImage={product.images[0]} />
+      <VirtualTryOnBot productId={product.id} productImage={product.image} />
     </div>
   );
 };
