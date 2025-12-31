@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Truck, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
+import { Truck, CreditCard } from "lucide-react";
 import { Header } from "@/components/Header";
 import { ImageGallery } from "@/components/ImageGallery";
 import { VirtualTryOnBot } from "@/components/VirtualTryOnBot";
@@ -12,7 +12,6 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const product = getProductById(id || "");
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [descriptionOpen, setDescriptionOpen] = useState(false);
   const { toast } = useToast();
 
   if (!product) {
@@ -84,16 +83,10 @@ const ProductDetail = () => {
               <p className="text-xs text-muted-foreground">Inclusive of all taxes</p>
             </div>
 
-            {/* Fabric & Fit Badges */}
+            {/* Category Badge */}
             <div className="flex flex-wrap gap-2">
               <span className="px-3 py-1.5 text-xs tracking-wide bg-secondary text-secondary-foreground rounded-full">
-                {product.fabricComposition}
-              </span>
-              <span className="px-3 py-1.5 text-xs tracking-wide bg-secondary text-secondary-foreground rounded-full">
-                {product.styleArchetype}
-              </span>
-              <span className="px-3 py-1.5 text-xs tracking-wide bg-secondary text-secondary-foreground rounded-full">
-                {product.gender}
+                {product.category}
               </span>
             </div>
 
@@ -130,36 +123,6 @@ const ProductDetail = () => {
               ADD TO CART
             </Button>
 
-            {/* Description Accordion */}
-            <div className="border-t border-border pt-6">
-              <button
-                onClick={() => setDescriptionOpen(!descriptionOpen)}
-                className="w-full flex items-center justify-between py-2"
-              >
-                <span className="text-sm font-medium">Description</span>
-                {descriptionOpen ? (
-                  <ChevronUp size={18} />
-                ) : (
-                  <ChevronDown size={18} />
-                )}
-              </button>
-              {descriptionOpen && (
-                <div className="pt-4 pb-2 animate-slide-up">
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {product.description}
-                  </p>
-                  {product.dimensions.chest > 0 && (
-                    <div className="mt-4 pt-4 border-t border-border">
-                      <p className="text-xs text-muted-foreground mb-2">Size M Dimensions:</p>
-                      <div className="flex gap-6 text-sm">
-                        <span>Chest: {product.dimensions.chest}"</span>
-                        <span>Length: {product.dimensions.length}"</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
 
             {/* Delivery Info */}
             <div className="border-t border-border pt-6 space-y-4">
