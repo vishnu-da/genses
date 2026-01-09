@@ -26,13 +26,14 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
   if (!productId) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="w-full">
       <iframe
         ref={iframeRef}
         src={`https://pidy-tryon.lovable.app/?productId=${productId}`}
         style={{
           border: 'none',
-          width: '400px',
+          width: '100%',
+          maxWidth: '400px',
           height: isExpanded ? '620px' : '80px',
           overflow: 'hidden',
           borderRadius: isExpanded ? '16px' : '50px',

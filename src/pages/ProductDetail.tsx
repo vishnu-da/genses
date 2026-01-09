@@ -115,6 +115,9 @@ const ProductDetail = () => {
               </div>
             </div>
 
+            {/* Virtual Try-On Widget */}
+            <VirtualTryOnBot productId={product.id} />
+
             {/* Add to Cart Button */}
             <Button
               onClick={handleAddToCart}
@@ -145,8 +148,6 @@ const ProductDetail = () => {
         </div>
       </main>
 
-      {/* Virtual Try-On Widget */}
-      <VirtualTryOnBot productId={product.id} />
     </div>
   );
 };
