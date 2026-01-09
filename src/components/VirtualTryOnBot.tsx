@@ -31,10 +31,13 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+        onClick={() => {
+          setIsOpen(true);
+          setIsExpanded(true);
+        }}
+        className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg transition hover:bg-primary/90"
       >
-        <Sparkles className="w-4 h-4" />
+        <Sparkles className="h-4 w-4" />
         Virtual Try-On
       </button>
     );
