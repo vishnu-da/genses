@@ -30,14 +30,13 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
       <iframe
         ref={iframeRef}
         src={`https://pidy-tryon.lovable.app/?productId=${productId}`}
+        allow="popups"
         style={{
           border: 'none',
-          width: '100%',
-          maxWidth: '400px',
-          height: isExpanded ? '620px' : '80px',
-          overflow: 'hidden',
-          borderRadius: isExpanded ? '16px' : '50px',
-          transition: 'height 0.3s ease, border-radius 0.3s ease',
+          width: isExpanded ? '400px' : '150px',
+          height: isExpanded ? '620px' : '45px',
+          background: 'transparent',
+          transition: 'width 0.3s ease, height 0.3s ease',
         }}
         title="Virtual Try-On"
       />
