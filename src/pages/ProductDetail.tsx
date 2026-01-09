@@ -145,8 +145,8 @@ const ProductDetail = () => {
         </div>
       </main>
 
-      {/* Virtual Try-On Bot (Hidden for this version) */}
-      <VirtualTryOnBot productId={product.id} productImage={product.image} />
+      {/* Virtual Try-On Widget */}
+      <VirtualTryOnBot productId={product.id} />
     </div>
   );
 };

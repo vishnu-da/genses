@@ -1,31 +1,45 @@
-// Virtual Try-On Bot Component
-// This component is structurally present but hidden for this version
-// Ready to be enabled when the feature is implemented
+import { useState, useEffect, useRef } from "react";
 
 interface VirtualTryOnBotProps {
   productId?: string;
-  productImage?: string;
 }
 
-export function VirtualTryOnBot({ productId, productImage }: VirtualTryOnBotProps) {
-  // Component is hidden - return null for now
-  // When ready to enable, replace null with the actual UI
-  
-  // Future implementation will include:
-  // - Camera/photo upload interface
-  // - AI-powered virtual try-on visualization
-  // - Size recommendations based on body measurements
-  
-  return null;
+export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Placeholder UI for future reference:
-  /*
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.origin !== 'https://pidy-tryon.lovable.app') return;
+      
+      if (e.data.type === 'tryon-expand') {
+        setIsExpanded(true);
+      } else if (e.data.type === 'tryon-collapse') {
+        setIsExpanded(false);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  if (!productId) return null;
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <button className="w-14 h-14 bg-foreground text-background rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
-        <Camera size={24} />
-      </button>
+      <iframe
+        ref={iframeRef}
+        src={`https://pidy-tryon.lovable.app/?productId=${productId}`}
+        style={{
+          border: 'none',
+          width: '400px',
+          height: isExpanded ? '620px' : '80px',
+          overflow: 'hidden',
+          borderRadius: isExpanded ? '16px' : '50px',
+          transition: 'height 0.3s ease, border-radius 0.3s ease',
+        }}
+        title="Virtual Try-On"
+      />
     </div>
   );
-  */
 }
