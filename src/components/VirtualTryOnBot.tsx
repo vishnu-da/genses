@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, X } from "lucide-react";
+import { X } from "lucide-react";
+import pidyLogo from "@/assets/pidy-logo.png";
 
 interface VirtualTryOnBotProps {
   productId?: string;
@@ -76,7 +77,7 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
           }}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg transition hover:bg-primary/90"
         >
-          <Sparkles className="h-4 w-4" />
+          <img src={pidyLogo} alt="Pidy" className="h-4 w-4" />
           Virtual Try-On
         </button>
       ) : (
@@ -115,8 +116,8 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
                 }}
                 className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 text-white transition hover:bg-black/60"
               >
-                <span className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg">
-                  <Sparkles className="h-4 w-4" />
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg">
+                  <img src={pidyLogo} alt="Pidy" className="h-4 w-4" />
                   Try On
                 </span>
               </button>
