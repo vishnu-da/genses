@@ -103,8 +103,27 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
               <X className="h-4 w-4" />
             </button>
 
+            {/* Centered Try On button overlay - clicks through to iframe */}
+            {!isLoading && (
+              <button
+                type="button"
+                onClick={() => {
+                  iframeRef.current?.contentWindow?.postMessage(
+                    { type: "tryon-auto-expand" },
+                    "https://pidy-tryon.lovable.app"
+                  );
+                }}
+                className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 text-white transition hover:bg-black/60"
+              >
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg">
+                  <Sparkles className="h-4 w-4" />
+                  Try On
+                </span>
+              </button>
+            )}
+
             {isLoading && (
-              <div className="absolute inset-0 grid place-items-center bg-background/70 backdrop-blur-sm">
+              <div className="absolute inset-0 z-10 grid place-items-center bg-background/70 backdrop-blur-sm">
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="text-sm text-muted-foreground">Loading try-on…</div>
 
