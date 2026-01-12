@@ -116,7 +116,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Virtual Try-On Widget */}
-            <VirtualTryOnBot productId={product.id} />
+            <VirtualTryOnBot productId={product.id} size={selectedSize || undefined} />
 
             {/* Add to Cart Button */}
             <Button

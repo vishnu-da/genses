@@ -4,9 +4,10 @@ import pidyLogo from "@/assets/pidy-logo.png";
 
 interface VirtualTryOnBotProps {
   productId?: string;
+  size?: string;
 }
 
-export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
+export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +65,7 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
 
   if (!productId) return null;
 
-  const tryOnUrl = `https://pidy-tryon.lovable.app/?productId=${productId}`;
+  const tryOnUrl = `https://pidy-tryon.lovable.app/?productId=${productId}${size ? `&size=${size}` : ''}`;
 
   // Always show the button; when clicked we open the iframe at full size
   return (
