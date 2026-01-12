@@ -62,91 +62,89 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
 
   if (!productId) return null;
 
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => {
-          setIsOpen(true);
-          setIsExpanded(true);
-          setIsLoading(true);
-        }}
-        className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg transition hover:bg-primary/90"
-      >
-        <Sparkles className="h-4 w-4" />
-        Virtual Try-On
-      </button>
-    );
-  }
-
-  const frameWidth = isExpanded ? 400 : 150;
-  const frameHeight = isExpanded ? 620 : 45;
   const tryOnUrl = `https://pidy-tryon.lovable.app/?productId=${productId}`;
 
+  // Always show the button; when clicked we open the iframe at full size
   return (
     <div className="w-full">
-      <div
-        className="relative overflow-hidden rounded-md"
-        style={{
-          width: `${frameWidth}px`,
-          height: `${frameHeight}px`,
-          background: "transparent",
-          transition: "width 0.3s ease, height 0.3s ease",
-        }}
-      >
-        {isLoading && (
-          <div className="absolute inset-0 grid place-items-center bg-background/70 backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-2 text-center">
-              <div className="text-sm text-muted-foreground">Loading try-on…</div>
+      {!isOpen ? (
+        <button
+          onClick={() => {
+            setIsOpen(true);
+            setIsExpanded(true);
+            setIsLoading(true);
+          }}
+          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg transition hover:bg-primary/90"
+        >
+          <Sparkles className="h-4 w-4" />
+          Virtual Try-On
+        </button>
+      ) : (
+        <>
+          <div
+            className="relative overflow-hidden rounded-md"
+            style={{
+              width: "400px",
+              height: "620px",
+              background: "transparent",
+            }}
+          >
+            {isLoading && (
+              <div className="absolute inset-0 grid place-items-center bg-background/70 backdrop-blur-sm">
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <div className="text-sm text-muted-foreground">Loading try-on…</div>
 
-              {showLoadHelp && (
-                <div className="max-w-[280px] text-xs text-muted-foreground">
-                  If this stays blank, the try-on service may be blocked in an iframe (often due to
-                  sign-in/cookies). Open it in a new tab:
-                  <div className="mt-2">
-                    <a
-                      className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground"
-                      href={tryOnUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Open Try‑On
-                    </a>
-                  </div>
+                  {showLoadHelp && (
+                    <div className="max-w-[280px] text-xs text-muted-foreground">
+                      If this stays blank, the try-on service may be blocked in an iframe (often due to
+                      sign-in/cookies). Open it in a new tab:
+                      <div className="mt-2">
+                        <a
+                          className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground"
+                          href={tryOnUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Open Try‑On
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            <iframe
+              ref={iframeRef}
+              src={tryOnUrl}
+              allow="camera; microphone; fullscreen; popups; storage-access-by-user-activation"
+              onLoad={() => {
+                setIsLoading(false);
+                iframeRef.current?.contentWindow?.postMessage(
+                  { type: "tryon-auto-expand" },
+                  "https://pidy-tryon.lovable.app"
+                );
+              }}
+              style={{
+                border: "none",
+                width: "100%",
+                height: "100%",
+                background: "transparent",
+              }}
+              title="Virtual Try-On"
+            />
           </div>
-        )}
 
-        <iframe
-          ref={iframeRef}
-          src={tryOnUrl}
-          allow="camera; microphone; fullscreen; popups; storage-access-by-user-activation"
-          onLoad={() => {
-            setIsLoading(false);
-            iframeRef.current?.contentWindow?.postMessage(
-              { type: "tryon-auto-expand" },
-              "https://pidy-tryon.lovable.app"
-            );
-          }}
-          style={{
-            border: "none",
-            width: "100%",
-            height: "100%",
-            background: "transparent",
-          }}
-          title="Virtual Try-On"
-        />
-      </div>
-
-      <a
-        className="mt-2 inline-flex text-xs text-muted-foreground underline-offset-4 hover:underline"
-        href={tryOnUrl}
-        target="_blank"
-        rel="noreferrer"
-      >
-        Open in new tab
-      </a>
+          <a
+            className="mt-2 inline-flex text-xs text-muted-foreground underline-offset-4 hover:underline"
+            href={tryOnUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open in new tab
+          </a>
+        </>
+      )}
     </div>
   );
 }
