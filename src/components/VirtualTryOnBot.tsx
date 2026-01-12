@@ -26,6 +26,22 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
+  // Send auto-expand message to iframe when it loads
+  useEffect(() => {
+    if (isOpen && iframeRef.current) {
+      const sendExpandMessage = () => {
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: 'tryon-auto-expand' },
+          'https://pidy-tryon.lovable.app'
+        );
+      };
+      // Send immediately and after a short delay to ensure iframe is ready
+      sendExpandMessage();
+      const timer = setTimeout(sendExpandMessage, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   if (!productId) return null;
 
   if (!isOpen) {
