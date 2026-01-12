@@ -152,15 +152,6 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
               title="Virtual Try-On"
             />
           </div>
-
-          <a
-            className="mt-2 inline-flex text-xs text-muted-foreground underline-offset-4 hover:underline"
-            href={tryOnUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open in new tab
-          </a>
         </>
       )}
     </div>
