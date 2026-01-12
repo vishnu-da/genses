@@ -11,7 +11,7 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showLoadHelp, setShowLoadHelp] = useState(false);
-  const [showCenterCta, setShowCenterCta] = useState(false);
+  
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -76,7 +76,6 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
             setIsOpen(true);
             setIsExpanded(true);
             setIsLoading(true);
-            setShowCenterCta(false);
           }}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg transition hover:bg-primary/90"
         >
@@ -100,7 +99,6 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
                 setIsExpanded(false);
                 setIsLoading(false);
                 setShowLoadHelp(false);
-                setShowCenterCta(false);
               }}
               aria-label="Close virtual try-on"
               className="absolute right-2 top-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-md bg-background/70 text-foreground shadow-sm backdrop-blur transition hover:bg-background"
@@ -108,27 +106,6 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
               <X className="h-4 w-4" />
             </button>
 
-            {/* Centered Try On button (doesn't block interacting with the iframe) */}
-            {showCenterCta && !isLoading && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCenterCta(false);
-                    iframeRef.current?.contentWindow?.postMessage(
-                      { type: "tryon-auto-expand" },
-                      "https://pidy-tryon.lovable.app"
-                    );
-                  }}
-                  className="pointer-events-auto"
-                >
-                  <span className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg">
-                    <img src={pidyLogo} alt="Pidy" className="h-4 w-4" />
-                    Try On
-                  </span>
-                </button>
-              </div>
-            )}
 
             {isLoading && (
               <div className="absolute inset-0 z-10 grid place-items-center bg-background/70 backdrop-blur-sm">
@@ -161,7 +138,6 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
               allow="camera; microphone; fullscreen; popups; storage-access-by-user-activation"
               onLoad={() => {
                 setIsLoading(false);
-                setShowCenterCta(true);
                 iframeRef.current?.contentWindow?.postMessage(
                   { type: "tryon-auto-expand" },
                   "https://pidy-tryon.lovable.app"
