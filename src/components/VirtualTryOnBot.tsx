@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 
 interface VirtualTryOnBotProps {
   productId?: string;
@@ -89,6 +89,20 @@ export function VirtualTryOnBot({ productId }: VirtualTryOnBotProps) {
               background: "transparent",
             }}
           >
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                setIsExpanded(false);
+                setIsLoading(false);
+                setShowLoadHelp(false);
+              }}
+              aria-label="Close virtual try-on"
+              className="absolute right-2 top-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-md bg-background/70 text-foreground shadow-sm backdrop-blur transition hover:bg-background"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
             {isLoading && (
               <div className="absolute inset-0 grid place-items-center bg-background/70 backdrop-blur-sm">
                 <div className="flex flex-col items-center gap-2 text-center">
