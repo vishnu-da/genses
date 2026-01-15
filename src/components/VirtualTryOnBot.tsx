@@ -63,7 +63,16 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
     return () => window.clearInterval(interval);
   }, [isOpen, productId]);
 
-  if (!productId) return null;
+  // Only first 5 real products support try-on
+  const tryOnEnabledProducts = [
+    'OVO-STAN-VRS-2025-001',
+    'KITH-LAX-PKT-2025-002',
+    'KNIT-POLO-JNY-2025-003',
+    'W-LEG-DENIM-2025-004',
+    'BTN-DWN-BRW-2025-005',
+  ];
+
+  if (!productId || !tryOnEnabledProducts.includes(productId)) return null;
 
   const tryOnUrl = `https://pidy-tryon.lovable.app/?productId=${productId}${size ? `&size=${size}` : ''}`;
 
