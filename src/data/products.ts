@@ -3,6 +3,12 @@ import blackTshirtImg from "@/assets/products/black-tshirt.png";
 import poloImg from "@/assets/products/polo.png";
 import jeansImg from "@/assets/products/jeans.png";
 import shirtImg from "@/assets/products/shirt.png";
+import stripedDressImg from "@/assets/products/striped-dress.png";
+import laceCulottesImg from "@/assets/products/lace-culottes.png";
+import lemonShirtImg from "@/assets/products/lemon-shirt.png";
+import braidedShortsImg from "@/assets/products/braided-shorts.png";
+import ribbedTankImg from "@/assets/products/ribbed-tank.png";
+import floralBikiniImg from "@/assets/products/floral-bikini.png";
 
 export interface Product {
   id: string;
@@ -14,6 +20,7 @@ export interface Product {
 }
 
 export const products: Product[] = [
+  // Original 5 products
   {
     id: 'OVO-STAN-VRS-2025-001',
     name: 'Stanford Varsity Jacket',
@@ -53,6 +60,55 @@ export const products: Product[] = [
     category: 'Crews',
     image: shirtImg,
     sizes: ['S', 'M', 'L', 'XL'],
+  },
+  // Women's apparel - 6 new products
+  {
+    id: 'JCREW-STRIPE-DRS-2026-006',
+    name: 'J.Crew Striped Smocked Dress',
+    price: 2999,
+    category: 'Dresses',
+    image: stripedDressImg,
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+  },
+  {
+    id: 'AEO-LACE-CUL-2026-007',
+    name: 'AEO Lace Trim Culottes',
+    price: 2999,
+    category: 'Pants',
+    image: laceCulottesImg,
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+  },
+  {
+    id: 'NEXT-CP-BTN-2026-008',
+    name: 'Next Lemon Print Shirt',
+    price: 2999,
+    category: 'Tops',
+    image: lemonShirtImg,
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+  },
+  {
+    id: 'NEXT-CRM-SHRT-2026-009',
+    name: 'Next Braided Belt Shorts',
+    price: 2999,
+    category: 'Shorts',
+    image: braidedShortsImg,
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+  },
+  {
+    id: 'SHEIN-RIB-TNK-2026-010',
+    name: 'SHEIN Ribbed Square Neck Tank',
+    price: 2999,
+    category: 'Tops',
+    image: ribbedTankImg,
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+  },
+  {
+    id: 'SWIM-FLOR-BKN-2026-011',
+    name: 'Floral Print Bikini Set',
+    price: 2999,
+    category: 'Swimwear',
+    image: floralBikiniImg,
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
   },
   // Dummy products to fill catalog
   {
@@ -113,7 +169,7 @@ export const products: Product[] = [
   },
 ];
 
-export const categories = ["All", "Crews", "Pants", "Jackets"];
+export const categories = ["All", "Crews", "Pants", "Jackets", "Dresses", "Tops", "Shorts", "Swimwear"];
 
 export function getProductById(id: string): Product | undefined {
   return products.find((p) => p.id === id);

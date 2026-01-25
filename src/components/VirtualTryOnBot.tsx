@@ -63,13 +63,19 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
     return () => window.clearInterval(interval);
   }, [isOpen, productId]);
 
-  // Only first 5 real products support try-on
+  // Products that support try-on (original 5 + 6 women's products)
   const tryOnEnabledProducts = [
     'OVO-STAN-VRS-2025-001',
     'KITH-LAX-PKT-2025-002',
     'KNIT-POLO-JNY-2025-003',
     'W-LEG-DENIM-2025-004',
     'BTN-DWN-BRW-2025-005',
+    'JCREW-STRIPE-DRS-2026-006',
+    'AEO-LACE-CUL-2026-007',
+    'NEXT-CP-BTN-2026-008',
+    'NEXT-CRM-SHRT-2026-009',
+    'SHEIN-RIB-TNK-2026-010',
+    'SWIM-FLOR-BKN-2026-011',
   ];
 
   if (!productId || !tryOnEnabledProducts.includes(productId)) return null;
