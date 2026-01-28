@@ -71,6 +71,15 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
             <X className="h-4 w-4" />
           </button>
 
+          <style>
+            {`
+              #pidy-tryon iframe {
+                background: #0d0d0d !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+              }
+            `}
+          </style>
           <div
             id="pidy-tryon"
             data-product-id={productId}
