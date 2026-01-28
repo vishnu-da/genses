@@ -1,28 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
-import pidyLogo from "@/assets/pidy-logo.png";
-
 interface VirtualTryOnBotProps {
   productId?: string;
   size?: string;
 }
 
 export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showLoadHelp, setShowLoadHelp] = useState(false);
-  
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    setShowLoadHelp(false);
-
-    if (!isLoading) return;
-    const t = window.setTimeout(() => setShowLoadHelp(true), 8000);
-    return () => window.clearTimeout(t);
-  }, [isOpen, isLoading]);
-
   // Products that support try-on (original 5 + 6 women's products)
   const tryOnEnabledProducts = [
     'OVO-STAN-VRS-2025-001',
@@ -40,83 +21,14 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
 
   if (!productId || !tryOnEnabledProducts.includes(productId)) return null;
 
-  const tryOnUrl = `https://pidy-tryon.lovable.app/?productId=${productId}${size ? `&size=${size}` : ''}`;
-
   return (
     <div className="w-full">
-      {!isOpen ? (
-        <button
-          type="button"
-          onClick={() => {
-            setIsOpen(true);
-            setIsLoading(true);
-          }}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg transition hover:bg-primary/90"
-        >
-          <img src={pidyLogo} alt="Pidy" className="h-4 w-4" />
-          Virtual Try-On
-        </button>
-      ) : (
-        <div
-          className="relative overflow-hidden rounded-md"
-          style={{
-            width: "400px",
-            height: "620px",
-            background: "transparent",
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => {
-              setIsOpen(false);
-              setIsLoading(false);
-              setShowLoadHelp(false);
-            }}
-            aria-label="Close virtual try-on"
-            className="absolute right-2 top-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-md bg-background/70 text-foreground shadow-sm backdrop-blur transition hover:bg-background"
-          >
-            <X className="h-4 w-4" />
-          </button>
-
-          {isLoading && (
-            <div className="absolute inset-0 z-10 grid place-items-center bg-background/70 backdrop-blur-sm">
-              <div className="flex flex-col items-center gap-2 text-center">
-                <div className="text-sm text-muted-foreground">Loading try-on…</div>
-
-                {showLoadHelp && (
-                  <div className="max-w-[280px] text-xs text-muted-foreground">
-                    If this stays blank, the try-on service may be blocked in an iframe. Open it in a new tab:
-                    <div className="mt-2">
-                      <a
-                        className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground"
-                        href={tryOnUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Open Try‑On
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <iframe
-            ref={iframeRef}
-            src={tryOnUrl}
-            allow="camera; microphone; fullscreen; popups; storage-access-by-user-activation"
-            onLoad={() => setIsLoading(false)}
-            style={{
-              border: "none",
-              width: "100%",
-              height: "100%",
-              background: "transparent",
-            }}
-            title="Virtual Try-On"
-          />
-        </div>
-      )}
+      <div
+        id="pidy-tryon"
+        data-product-id={productId}
+        data-size={size || "M"}
+        data-pidy-auto
+      />
     </div>
   );
 }
