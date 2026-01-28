@@ -127,7 +127,7 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
 
   const tryOnUrl = `https://pidy-tryon.lovable.app/?productId=${encodeURIComponent(
     productId
-  )}&size=${encodeURIComponent(size || "M")}&debug=true`;
+  )}&size=${encodeURIComponent(size || "M")}`;
 
   return (
     <div className="w-full">
@@ -229,7 +229,6 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
               ref={containerRef}
               data-product-id={productId}
               data-size={size || "M"}
-              data-debug="true"
               data-pidy-auto
               style={{ width: "100%", height: "100%" }}
             />
