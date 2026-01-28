@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import pidyLogo from "@/assets/pidy-logo.png";
 
 interface VirtualTryOnBotProps {
   productId?: string;
@@ -6,6 +8,8 @@ interface VirtualTryOnBotProps {
 }
 
 export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   // Products that support try-on (original 5 + 6 women's products)
   const tryOnEnabledProducts = [
     'OVO-STAN-VRS-2025-001',
@@ -21,34 +25,61 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
     'SWIM-FLOR-BKN-2026-011',
   ];
 
-  // Trigger SDK scan when component mounts or props change
+  // Trigger SDK scan when widget opens
   useEffect(() => {
-    if (!productId || !tryOnEnabledProducts.includes(productId)) return;
+    if (!isOpen) return;
     
-    // Give the DOM a moment to render, then trigger scan
     const timer = setTimeout(() => {
-      // Try manual scan if available
       if (typeof (window as any).PidyTryOn?.scan === 'function') {
         (window as any).PidyTryOn.scan();
       } else {
-        // Fallback to custom event
         window.dispatchEvent(new Event('pidy-tryon-scan'));
       }
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [productId, size]);
+  }, [isOpen, productId, size]);
 
   if (!productId || !tryOnEnabledProducts.includes(productId)) return null;
 
   return (
     <div className="w-full">
-      <div
-        id="pidy-tryon"
-        data-product-id={productId}
-        data-size={size || "M"}
-        data-pidy-auto
-      />
+      {!isOpen ? (
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg transition hover:bg-primary/90"
+        >
+          <img src={pidyLogo} alt="Pidy" className="h-4 w-4" />
+          Virtual Try-On
+        </button>
+      ) : (
+        <div
+          className="relative overflow-hidden rounded-md border border-border"
+          style={{
+            width: "400px",
+            height: "620px",
+            background: "#0d0d0d",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            aria-label="Close virtual try-on"
+            className="absolute right-2 top-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-md bg-background/70 text-foreground shadow-sm backdrop-blur transition hover:bg-background"
+          >
+            <X className="h-4 w-4" />
+          </button>
+
+          <div
+            id="pidy-tryon"
+            data-product-id={productId}
+            data-size={size || "M"}
+            data-pidy-auto
+            style={{ width: "100%", height: "100%" }}
+          />
+        </div>
+      )}
     </div>
   );
 }
