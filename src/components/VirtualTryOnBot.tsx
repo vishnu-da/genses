@@ -9,6 +9,7 @@ interface VirtualTryOnBotProps {
 
 export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [surfaceMode, setSurfaceMode] = useState<"dark" | "light">("dark");
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Products that support try-on (original 5 + 6 women's products)
@@ -50,6 +51,12 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
     const host = containerRef.current;
     if (!host) return;
 
+    // Read the surface from the wrapper so our injected iframe background can
+    // follow the UI toggle.
+    const surface =
+      getComputedStyle(host).getPropertyValue("--pidy-surface") ||
+      "hsl(var(--tryon-surface))";
+
     const applyFixes = (root: ParentNode) => {
       const nodes = Array.from(
         root.querySelectorAll<HTMLElement>("iframe, canvas, img, video")
@@ -78,7 +85,7 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
           el.style.setProperty("z-index", "0", "important");
           el.style.setProperty(
             "background",
-            "hsl(var(--tryon-surface))",
+            surface.trim() || "hsl(var(--tryon-surface))",
             "important"
           );
         }
@@ -114,9 +121,13 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
       window.clearInterval(interval);
       obs.disconnect();
     };
-  }, [isOpen]);
+  }, [isOpen, surfaceMode]);
 
   if (!productId || !tryOnEnabledProducts.includes(productId)) return null;
+
+  const tryOnUrl = `https://pidy-tryon.lovable.app/?productId=${encodeURIComponent(
+    productId
+  )}&size=${encodeURIComponent(size || "M")}&debug=true`;
 
   return (
     <div className="w-full">
@@ -130,71 +141,99 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
           Virtual Try-On
         </button>
       ) : (
-        <div
-          className="relative overflow-hidden rounded-md border border-border"
-          style={{
-            width: "400px",
-            height: "620px",
-              background: "hsl(var(--tryon-surface))",
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setIsOpen(false)}
-            aria-label="Close virtual try-on"
-            className="absolute right-2 top-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-md bg-background/70 text-foreground shadow-sm backdrop-blur transition hover:bg-background"
-          >
-            <X className="h-4 w-4" />
-          </button>
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                setSurfaceMode((m) => (m === "dark" ? "light" : "dark"))
+              }
+              className="inline-flex items-center justify-center rounded-full border border-border bg-background px-3 py-2 text-xs text-foreground transition hover:bg-secondary"
+            >
+              Surface: {surfaceMode === "dark" ? "Dark" : "Light"}
+            </button>
 
-          <style>
-            {`
-               #pidy-tryon {
-                 width: 100% !important;
-                 height: 100% !important;
-                 position: relative;
-                  z-index: 0;
-               }
+            <a
+              href={tryOnUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-background px-3 py-2 text-xs text-foreground transition hover:bg-secondary"
+            >
+              Open in new tab
+            </a>
+          </div>
 
-               #pidy-tryon > * {
-                 width: 100% !important;
-                 height: 100% !important;
-               }
-
-               #pidy-tryon iframe {
-                 width: 100% !important;
-                 height: 100% !important;
-                 display: block !important;
-                 border: 0 !important;
-                 background: hsl(var(--tryon-surface)) !important;
-                 opacity: 1 !important;
-                 visibility: visible !important;
-                 pointer-events: auto !important;
-               }
-
-               #pidy-tryon canvas,
-               #pidy-tryon img,
-               #pidy-tryon video {
-                 opacity: 1 !important;
-                 visibility: visible !important;
-                  position: relative !important;
-                  z-index: 30 !important;
-                  max-width: 100% !important;
-                  max-height: 100% !important;
-                  filter: none !important;
-                  mix-blend-mode: normal !important;
-               }
-            `}
-          </style>
           <div
-            id="pidy-tryon"
-            ref={containerRef}
-            data-product-id={productId}
-            data-size={size || "M"}
-            data-debug="true"
-            data-pidy-auto
-            style={{ width: "100%", height: "100%" }}
-          />
+            className="relative overflow-hidden rounded-md border border-border"
+            style={{
+              width: "400px",
+              height: "620px",
+              // Provide a surface token the SDK/iframe can inherit.
+              ["--pidy-surface" as any]:
+                surfaceMode === "light"
+                  ? "hsl(var(--background))"
+                  : "hsl(var(--tryon-surface))",
+              background: "var(--pidy-surface)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close virtual try-on"
+              className="absolute right-2 top-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-md bg-background/70 text-foreground shadow-sm backdrop-blur transition hover:bg-background"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <style>
+              {`
+                 #pidy-tryon {
+                   width: 100% !important;
+                   height: 100% !important;
+                   position: relative;
+                   z-index: 0;
+                 }
+
+                 #pidy-tryon > * {
+                   width: 100% !important;
+                   height: 100% !important;
+                 }
+
+                 #pidy-tryon iframe {
+                   width: 100% !important;
+                   height: 100% !important;
+                   display: block !important;
+                   border: 0 !important;
+                   background: var(--pidy-surface) !important;
+                   opacity: 1 !important;
+                   visibility: visible !important;
+                   pointer-events: auto !important;
+                 }
+
+                 #pidy-tryon canvas,
+                 #pidy-tryon img,
+                 #pidy-tryon video {
+                   opacity: 1 !important;
+                   visibility: visible !important;
+                   position: relative !important;
+                   z-index: 30 !important;
+                   max-width: 100% !important;
+                   max-height: 100% !important;
+                   filter: none !important;
+                   mix-blend-mode: normal !important;
+                 }
+              `}
+            </style>
+            <div
+              id="pidy-tryon"
+              ref={containerRef}
+              data-product-id={productId}
+              data-size={size || "M"}
+              data-debug="true"
+              data-pidy-auto
+              style={{ width: "100%", height: "100%" }}
+            />
+          </div>
         </div>
       )}
     </div>
