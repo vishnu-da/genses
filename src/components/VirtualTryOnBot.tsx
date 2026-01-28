@@ -63,6 +63,13 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
         el.style.setProperty("width", "100%", "important");
         el.style.setProperty("height", "100%", "important");
         el.style.setProperty("display", "block", "important");
+        el.style.setProperty("max-width", "100%", "important");
+        el.style.setProperty("max-height", "100%", "important");
+
+        // Some SDK themes apply filters/blend-modes that can effectively hide
+        // light/transparent PNGs on dark surfaces.
+        el.style.setProperty("filter", "none", "important");
+        el.style.setProperty("mix-blend-mode", "normal", "important");
 
         if (el.tagName.toLowerCase() === "iframe") {
           el.style.setProperty("border", "0", "important");
@@ -74,6 +81,12 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
             "hsl(var(--tryon-surface))",
             "important"
           );
+        }
+
+        // Keep media above SDK overlays but within the try-on stacking context.
+        if (el.tagName.toLowerCase() !== "iframe") {
+          el.style.setProperty("position", "relative", "important");
+          el.style.setProperty("z-index", "30", "important");
         }
       }
     };
@@ -140,6 +153,7 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
                  width: 100% !important;
                  height: 100% !important;
                  position: relative;
+                  z-index: 0;
                }
 
                #pidy-tryon > * {
@@ -163,6 +177,12 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
                #pidy-tryon video {
                  opacity: 1 !important;
                  visibility: visible !important;
+                  position: relative !important;
+                  z-index: 30 !important;
+                  max-width: 100% !important;
+                  max-height: 100% !important;
+                  filter: none !important;
+                  mix-blend-mode: normal !important;
                }
             `}
           </style>
