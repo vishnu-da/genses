@@ -139,6 +139,8 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
       ) : (
         <div className="space-y-3">
           <div
+            ref={containerRef}
+            data-pidy-host-root
             className="relative overflow-hidden rounded-md border border-border"
             style={{
               width: "400px",
@@ -157,19 +159,19 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
 
             <style>
               {`
-                 #pidy-tryon {
+                 [data-pidy-host-root] {
                    width: 100% !important;
                    height: 100% !important;
                    position: relative;
                    z-index: 0;
                  }
 
-                 #pidy-tryon > * {
+                  [data-pidy-host-root] > * {
                    width: 100% !important;
                    height: 100% !important;
                  }
 
-                 #pidy-tryon iframe {
+                  [data-pidy-host-root] iframe {
                    width: 100% !important;
                    height: 100% !important;
                    display: block !important;
@@ -180,9 +182,9 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
                    pointer-events: auto !important;
                  }
 
-                 #pidy-tryon canvas,
-                 #pidy-tryon img,
-                 #pidy-tryon video {
+                  [data-pidy-host-root] canvas,
+                  [data-pidy-host-root] img,
+                  [data-pidy-host-root] video {
                    opacity: 1 !important;
                    visibility: visible !important;
                    position: relative !important;
@@ -194,10 +196,15 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
                  }
               `}
             </style>
+
+            {/*
+              The SDK may replace the target element entirely (removing its id/ref).
+              Keep a stable wrapper (the element above) as our ref + styling root,
+              and let the SDK mount into this inner target.
+            */}
             <div
               key={`${productId}-${size}`}
               id="pidy-tryon"
-              ref={containerRef}
               data-product-id={productId}
               data-size={size || "M"}
               data-pidy-auto
