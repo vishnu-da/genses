@@ -195,6 +195,7 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
               `}
             </style>
             <div
+              key={`${productId}-${size}`}
               id="pidy-tryon"
               ref={containerRef}
               data-product-id={productId}
