@@ -9,7 +9,7 @@ interface VirtualTryOnBotProps {
 
 export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [surfaceMode, setSurfaceMode] = useState<"dark" | "light">("dark");
+  
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Products that support try-on (original 5 + 6 women's products)
@@ -121,13 +121,9 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
       window.clearInterval(interval);
       obs.disconnect();
     };
-  }, [isOpen, surfaceMode]);
+  }, [isOpen]);
 
   if (!productId || !tryOnEnabledProducts.includes(productId)) return null;
-
-  const tryOnUrl = `https://pidy-tryon.lovable.app/?productId=${encodeURIComponent(
-    productId
-  )}&size=${encodeURIComponent(size || "M")}`;
 
   return (
     <div className="w-full">
@@ -142,38 +138,12 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
         </button>
       ) : (
         <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() =>
-                setSurfaceMode((m) => (m === "dark" ? "light" : "dark"))
-              }
-              className="inline-flex items-center justify-center rounded-full border border-border bg-background px-3 py-2 text-xs text-foreground transition hover:bg-secondary"
-            >
-              Surface: {surfaceMode === "dark" ? "Dark" : "Light"}
-            </button>
-
-            <a
-              href={tryOnUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-full border border-border bg-background px-3 py-2 text-xs text-foreground transition hover:bg-secondary"
-            >
-              Open in new tab
-            </a>
-          </div>
-
           <div
             className="relative overflow-hidden rounded-md border border-border"
             style={{
               width: "400px",
               height: "620px",
-              // Provide a surface token the SDK/iframe can inherit.
-              ["--pidy-surface" as any]:
-                surfaceMode === "light"
-                  ? "hsl(var(--background))"
-                  : "hsl(var(--tryon-surface))",
-              background: "var(--pidy-surface)",
+              background: "hsl(var(--tryon-surface))",
             }}
           >
             <button
