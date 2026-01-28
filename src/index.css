@@ -45,6 +45,10 @@
     --gray-light: 0 0% 96%;
     --gray-medium: 0 0% 75%;
     --gray-dark: 0 0% 20%;
+
+    /* Virtual Try-On surface */
+    --tryon-surface: 0 0% 5%;
+    --tryon-surface-foreground: 0 0% 100%;
   }
 
   .dark {
@@ -75,6 +79,10 @@
     --border: 0 0% 20%;
     --input: 0 0% 20%;
     --ring: 0 0% 100%;
+
+    /* Virtual Try-On surface */
+    --tryon-surface: 0 0% 5%;
+    --tryon-surface-foreground: 0 0% 100%;
   }
 }
 
