@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 interface VirtualTryOnBotProps {
   productId?: string;
   size?: string;
@@ -18,6 +20,24 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
     'SHEIN-RIB-TNK-2026-010',
     'SWIM-FLOR-BKN-2026-011',
   ];
+
+  // Trigger SDK scan when component mounts or props change
+  useEffect(() => {
+    if (!productId || !tryOnEnabledProducts.includes(productId)) return;
+    
+    // Give the DOM a moment to render, then trigger scan
+    const timer = setTimeout(() => {
+      // Try manual scan if available
+      if (typeof (window as any).PidyTryOn?.scan === 'function') {
+        (window as any).PidyTryOn.scan();
+      } else {
+        // Fallback to custom event
+        window.dispatchEvent(new Event('pidy-tryon-scan'));
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [productId, size]);
 
   if (!productId || !tryOnEnabledProducts.includes(productId)) return null;
 
