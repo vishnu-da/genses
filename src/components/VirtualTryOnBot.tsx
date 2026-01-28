@@ -84,6 +84,7 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
             id="pidy-tryon"
             data-product-id={productId}
             data-size={size || "M"}
+            data-debug="true"
             data-pidy-auto
             style={{ width: "100%", height: "100%" }}
           />
