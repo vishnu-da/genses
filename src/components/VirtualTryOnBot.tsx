@@ -128,13 +128,17 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
           el.style.setProperty("position", "absolute", "important");
           el.style.setProperty("top", "0", "important");
           el.style.setProperty("left", "0", "important");
-          el.style.setProperty("z-index", "10", "important");
+          // Keep the iframe on top. Some SDK builds also inject a blank canvas/img
+          // into the host DOM; if that gets a higher z-index it can appear as a
+          // white overlay.
+          el.style.setProperty("z-index", "30", "important");
           el.style.setProperty("background", "transparent", "important");
         } else {
           el.style.setProperty("max-width", "100%", "important");
           el.style.setProperty("max-height", "100%", "important");
           el.style.setProperty("position", "relative", "important");
-          el.style.setProperty("z-index", "30", "important");
+          // Keep non-iframe media behind the iframe to avoid covering it.
+          el.style.setProperty("z-index", "10", "important");
         }
       }
     };
@@ -193,7 +197,7 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
               type="button"
               onClick={() => setIsOpen(false)}
               aria-label="Close virtual try-on"
-              className="absolute right-2 top-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-md bg-background/70 text-foreground shadow-sm backdrop-blur transition hover:bg-background"
+              className="absolute right-2 top-2 z-40 inline-flex h-9 w-9 items-center justify-center rounded-md bg-background/70 text-foreground shadow-sm backdrop-blur transition hover:bg-background"
             >
               <X className="h-4 w-4" />
             </button>
@@ -233,7 +237,7 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
                    position: absolute !important;
                    top: 0 !important;
                    left: 0 !important;
-                   z-index: 10 !important;
+                    z-index: 30 !important;
                  }
 
                   [data-pidy-host-root] canvas,
@@ -242,7 +246,7 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
                    opacity: 1 !important;
                    visibility: visible !important;
                    position: relative !important;
-                   z-index: 30 !important;
+                    z-index: 10 !important;
                    max-width: 100% !important;
                    max-height: 100% !important;
                    filter: none !important;
