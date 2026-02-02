@@ -100,13 +100,15 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
     const host = containerRef.current;
     if (!host) return;
 
-    // Read the surface from the wrapper so our injected iframe background can
-    // follow the UI toggle.
-    const surface =
-      getComputedStyle(host).getPropertyValue("--pidy-surface") ||
-      "hsl(var(--tryon-surface))";
-
     const applyFixes = (root: ParentNode) => {
+      // Force wrapper divs to take full size
+      const wrappers = Array.from(root.querySelectorAll<HTMLElement>("div"));
+      for (const div of wrappers) {
+        div.style.setProperty("width", "100%", "important");
+        div.style.setProperty("height", "100%", "important");
+        div.style.setProperty("min-height", "620px", "important");
+      }
+
       const nodes = Array.from(
         root.querySelectorAll<HTMLElement>("iframe, canvas, img, video")
       );
@@ -114,33 +116,23 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
       for (const el of nodes) {
         el.style.setProperty("opacity", "1", "important");
         el.style.setProperty("visibility", "visible", "important");
-
-        // Ensure the main surface fills our container.
-        el.style.setProperty("width", "100%", "important");
-        el.style.setProperty("height", "100%", "important");
         el.style.setProperty("display", "block", "important");
-        el.style.setProperty("max-width", "100%", "important");
-        el.style.setProperty("max-height", "100%", "important");
-
-        // Some SDK themes apply filters/blend-modes that can effectively hide
-        // light/transparent PNGs on dark surfaces.
         el.style.setProperty("filter", "none", "important");
         el.style.setProperty("mix-blend-mode", "normal", "important");
 
         if (el.tagName.toLowerCase() === "iframe") {
+          el.style.setProperty("width", "400px", "important");
+          el.style.setProperty("height", "620px", "important");
+          el.style.setProperty("min-height", "620px", "important");
           el.style.setProperty("border", "0", "important");
           el.style.setProperty("position", "absolute", "important");
-          el.style.setProperty("inset", "0", "important");
-          el.style.setProperty("z-index", "0", "important");
-          el.style.setProperty(
-            "background",
-            surface.trim() || "hsl(var(--tryon-surface))",
-            "important"
-          );
-        }
-
-        // Keep media above SDK overlays but within the try-on stacking context.
-        if (el.tagName.toLowerCase() !== "iframe") {
+          el.style.setProperty("top", "0", "important");
+          el.style.setProperty("left", "0", "important");
+          el.style.setProperty("z-index", "10", "important");
+          el.style.setProperty("background", "transparent", "important");
+        } else {
+          el.style.setProperty("max-width", "100%", "important");
+          el.style.setProperty("max-height", "100%", "important");
           el.style.setProperty("position", "relative", "important");
           el.style.setProperty("z-index", "30", "important");
         }
@@ -194,7 +186,7 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
             style={{
               width: "400px",
               height: "620px",
-              background: "hsl(var(--tryon-surface))",
+              background: "#666",
             }}
           >
             <button
@@ -212,24 +204,36 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
                    width: 400px !important;
                    height: 620px !important;
                    min-height: 620px !important;
-                   position: relative;
+                   position: relative !important;
                    z-index: 0;
                  }
 
-                  [data-pidy-host-root] > * {
+                  /* Force ALL descendants to fill the container */
+                  [data-pidy-host-root] * {
+                   box-sizing: border-box !important;
+                 }
+
+                  [data-pidy-host-root] > *,
+                  [data-pidy-host-root] > * > * {
                    width: 100% !important;
                    height: 100% !important;
+                   min-height: 620px !important;
                  }
 
                   [data-pidy-host-root] iframe {
-                   width: 100% !important;
-                   height: 100% !important;
+                   width: 400px !important;
+                   height: 620px !important;
+                   min-height: 620px !important;
                    display: block !important;
                    border: 0 !important;
-                   background: var(--pidy-surface) !important;
+                   background: transparent !important;
                    opacity: 1 !important;
                    visibility: visible !important;
                    pointer-events: auto !important;
+                   position: absolute !important;
+                   top: 0 !important;
+                   left: 0 !important;
+                   z-index: 10 !important;
                  }
 
                   [data-pidy-host-root] canvas,
