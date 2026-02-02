@@ -209,8 +209,9 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
             <style>
               {`
                  [data-pidy-host-root] {
-                   width: 100% !important;
-                   height: 100% !important;
+                   width: 400px !important;
+                   height: 620px !important;
+                   min-height: 620px !important;
                    position: relative;
                    z-index: 0;
                  }
