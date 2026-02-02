@@ -42,6 +42,55 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
     return () => clearTimeout(timer);
   }, [isOpen, productId, size]);
 
+  // Some SDK builds show an "Enter Suite" gate/overlay that requires a click.
+  // If that button is injected into our host DOM (or its shadow root), we can
+  // safely auto-click it to reduce user friction.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const host = containerRef.current;
+    if (!host) return;
+
+    const start = Date.now();
+    const maxMs = 8000;
+
+    const findAndClick = (root: ParentNode) => {
+      const candidates = Array.from(
+        root.querySelectorAll<HTMLElement>("button,[role='button'],a")
+      );
+
+      for (const el of candidates) {
+        const label = (el.textContent || "").trim().toLowerCase();
+        if (!label) continue;
+        if (!label.includes("enter suite")) continue;
+
+        // Avoid clicking disabled buttons.
+        if (el instanceof HTMLButtonElement && el.disabled) continue;
+
+        el.click();
+        return true;
+      }
+
+      return false;
+    };
+
+    const tick = () => {
+      if (Date.now() - start > maxMs) return;
+
+      // Try within host.
+      if (findAndClick(host)) return;
+
+      // Try within shadow root if present.
+      const sr = (host as any).shadowRoot as ShadowRoot | null;
+      if (sr && findAndClick(sr)) return;
+
+      timer = window.setTimeout(tick, 250);
+    };
+
+    let timer = window.setTimeout(tick, 250);
+    return () => window.clearTimeout(timer);
+  }, [isOpen]);
+
   // Some SDKs render inside a (shadow) root and/or apply inline styles that
   // can make the media layer effectively invisible. This ensures any injected
   // iframe/canvas/img/video is visible and fills our container.
