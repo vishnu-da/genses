@@ -9,10 +9,9 @@ interface VirtualTryOnBotProps {
 
 export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
   const [isOpen, setIsOpen] = useState(false);
-  
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const widgetRef = useRef<HTMLDivElement | null>(null);
 
-  // Products that support try-on (original 5 + 6 women's products)
+  // Products that support try-on
   const tryOnEnabledProducts = [
     'OVO-STAN-VRS-2025-001',
     'KITH-LAX-PKT-2025-002',
@@ -27,146 +26,29 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
     'SWIM-FLOR-BKN-2026-011',
   ];
 
-  // Trigger SDK scan when widget opens
+  // Initialize widget via PidyTryOn.init() when opened
   useEffect(() => {
-    if (!isOpen) return;
-    
-    const timer = setTimeout(() => {
-      if (typeof (window as any).PidyTryOn?.scan === 'function') {
+    if (!isOpen || !productId) return;
+
+    const initWidget = () => {
+      if (typeof (window as any).PidyTryOn?.init === "function") {
+        (window as any).PidyTryOn.init({
+          container: "#pidy-widget",
+          productId: productId,
+          size: size || "M",
+          width: 400,
+          height: 620,
+          authMethod: "modal",
+        });
+      } else if (typeof (window as any).PidyTryOn?.scan === "function") {
         (window as any).PidyTryOn.scan();
-      } else {
-        window.dispatchEvent(new Event('pidy-tryon-scan'));
       }
-    }, 100);
-    
+    };
+
+    // Small delay to ensure the container DOM node is mounted
+    const timer = setTimeout(initWidget, 150);
     return () => clearTimeout(timer);
   }, [isOpen, productId, size]);
-
-  // Some SDK builds show an "Enter Suite" gate/overlay that requires a click.
-  // If that button is injected into our host DOM (or its shadow root), we can
-  // safely auto-click it to reduce user friction.
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const host = containerRef.current;
-    if (!host) return;
-
-    const start = Date.now();
-    const maxMs = 8000;
-
-    const findAndClick = (root: ParentNode) => {
-      const candidates = Array.from(
-        root.querySelectorAll<HTMLElement>("button,[role='button'],a")
-      );
-
-      for (const el of candidates) {
-        const label = (el.textContent || "").trim().toLowerCase();
-        if (!label) continue;
-        if (!label.includes("enter suite")) continue;
-
-        // Avoid clicking disabled buttons.
-        if (el instanceof HTMLButtonElement && el.disabled) continue;
-
-        el.click();
-        return true;
-      }
-
-      return false;
-    };
-
-    const tick = () => {
-      if (Date.now() - start > maxMs) return;
-
-      // Try within host.
-      if (findAndClick(host)) return;
-
-      // Try within shadow root if present.
-      const sr = (host as any).shadowRoot as ShadowRoot | null;
-      if (sr && findAndClick(sr)) return;
-
-      timer = window.setTimeout(tick, 250);
-    };
-
-    let timer = window.setTimeout(tick, 250);
-    return () => window.clearTimeout(timer);
-  }, [isOpen]);
-
-  // Some SDKs render inside a (shadow) root and/or apply inline styles that
-  // can make the media layer effectively invisible. This ensures any injected
-  // iframe/canvas/img/video is visible and fills our container.
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const host = containerRef.current;
-    if (!host) return;
-
-    const applyFixes = (root: ParentNode) => {
-      // Force wrapper divs to take full size
-      const wrappers = Array.from(root.querySelectorAll<HTMLElement>("div"));
-      for (const div of wrappers) {
-        div.style.setProperty("width", "100%", "important");
-        div.style.setProperty("height", "100%", "important");
-        div.style.setProperty("min-height", "620px", "important");
-      }
-
-      const nodes = Array.from(
-        root.querySelectorAll<HTMLElement>("iframe, canvas, img, video")
-      );
-
-      for (const el of nodes) {
-        el.style.setProperty("opacity", "1", "important");
-        el.style.setProperty("visibility", "visible", "important");
-        el.style.setProperty("display", "block", "important");
-        el.style.setProperty("filter", "none", "important");
-        el.style.setProperty("mix-blend-mode", "normal", "important");
-
-        if (el.tagName.toLowerCase() === "iframe") {
-          el.style.setProperty("width", "400px", "important");
-          el.style.setProperty("height", "620px", "important");
-          el.style.setProperty("min-height", "620px", "important");
-          el.style.setProperty("border", "0", "important");
-          el.style.setProperty("position", "absolute", "important");
-          el.style.setProperty("top", "0", "important");
-          el.style.setProperty("left", "0", "important");
-          // Keep the iframe on top. Some SDK builds also inject a blank canvas/img
-          // into the host DOM; if that gets a higher z-index it can appear as a
-          // white overlay.
-          el.style.setProperty("z-index", "30", "important");
-          el.style.setProperty("background", "transparent", "important");
-        } else {
-          el.style.setProperty("max-width", "100%", "important");
-          el.style.setProperty("max-height", "100%", "important");
-          el.style.setProperty("position", "relative", "important");
-          // Keep non-iframe media behind the iframe to avoid covering it.
-          el.style.setProperty("z-index", "10", "important");
-        }
-      }
-    };
-
-    // Apply immediately on host.
-    applyFixes(host);
-
-    // Apply within shadow root if/when it appears.
-    const interval = window.setInterval(() => {
-      applyFixes(host);
-      const sr = (host as any).shadowRoot as ShadowRoot | null;
-      if (sr) applyFixes(sr);
-    }, 200);
-
-    // Observe late-added nodes.
-    const obs = new MutationObserver(() => {
-      applyFixes(host);
-      const sr = (host as any).shadowRoot as ShadowRoot | null;
-      if (sr) applyFixes(sr);
-    });
-
-    obs.observe(host, { childList: true, subtree: true });
-
-    return () => {
-      window.clearInterval(interval);
-      obs.disconnect();
-    };
-  }, [isOpen]);
 
   if (!productId || !tryOnEnabledProducts.includes(productId)) return null;
 
@@ -184,14 +66,8 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
       ) : (
         <div className="space-y-3">
           <div
-            ref={containerRef}
-            data-pidy-host-root
             className="relative overflow-hidden rounded-md border border-border"
-            style={{
-              width: "400px",
-              height: "620px",
-              background: "#666",
-            }}
+            style={{ width: "400px", height: "620px" }}
           >
             <button
               type="button"
@@ -202,70 +78,13 @@ export function VirtualTryOnBot({ productId, size }: VirtualTryOnBotProps) {
               <X className="h-4 w-4" />
             </button>
 
-            <style>
-              {`
-                 [data-pidy-host-root] {
-                   width: 400px !important;
-                   height: 620px !important;
-                   min-height: 620px !important;
-                   position: relative !important;
-                   z-index: 0;
-                 }
-
-                  /* Force ALL descendants to fill the container */
-                  [data-pidy-host-root] * {
-                   box-sizing: border-box !important;
-                 }
-
-                  [data-pidy-host-root] > *,
-                  [data-pidy-host-root] > * > * {
-                   width: 100% !important;
-                   height: 100% !important;
-                   min-height: 620px !important;
-                 }
-
-                  [data-pidy-host-root] iframe {
-                   width: 400px !important;
-                   height: 620px !important;
-                   min-height: 620px !important;
-                   display: block !important;
-                   border: 0 !important;
-                   background: transparent !important;
-                   opacity: 1 !important;
-                   visibility: visible !important;
-                   pointer-events: auto !important;
-                   position: absolute !important;
-                   top: 0 !important;
-                   left: 0 !important;
-                    z-index: 30 !important;
-                 }
-
-                  [data-pidy-host-root] canvas,
-                  [data-pidy-host-root] img,
-                  [data-pidy-host-root] video {
-                   opacity: 1 !important;
-                   visibility: visible !important;
-                   position: relative !important;
-                    z-index: 10 !important;
-                   max-width: 100% !important;
-                   max-height: 100% !important;
-                   filter: none !important;
-                   mix-blend-mode: normal !important;
-                 }
-              `}
-            </style>
-
-            {/*
-              The SDK may replace the target element entirely (removing its id/ref).
-              Keep a stable wrapper (the element above) as our ref + styling root,
-              and let the SDK mount into this inner target.
-            */}
             <div
               key={`${productId}-${size}`}
-              id="pidy-tryon"
+              id="pidy-widget"
+              ref={widgetRef}
               data-product-id={productId}
               data-size={size || "M"}
-              data-pidy-auto
+              data-pidy-tryon
               style={{ width: "100%", height: "100%" }}
             />
           </div>
